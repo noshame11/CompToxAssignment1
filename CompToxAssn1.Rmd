@@ -1,0 +1,31 @@
+---
+title: "Rotenone Mortality"
+author: "Vincent Tam"
+date: "February 12, 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(broom)
+library(httk)
+data = read.csv("./RotenoneMortalityRate.csv", header = TRUE)
+
+```
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
