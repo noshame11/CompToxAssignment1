@@ -11,7 +11,11 @@ library(tidyverse)
 library(janitor)
 library(broom)
 library(httk)
-data = read.csv("./RotenoneMortalityRate.csv", header = TRUE)
+data = read_csv("./RotenoneMortalityRate.csv")
+str(data)
+View(data)
+
+
 
 ```
 

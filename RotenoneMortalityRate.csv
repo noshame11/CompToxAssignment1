@@ -1,6 +1,4 @@
-Assignment 1: Data,Replicate,,,,,,,,,,,,,,,,,
-Compound: Rotenone,1,,,2,,,3,,,4,,,5,,,6,,
-Concentration (micromolar),All ,Dead,Mortality Rate,All ,Dead,Mortality Rate,All ,Dead,Mortality Rate,All ,Dead,Mortality Rate,All ,Dead,Mortality Rate,All ,Dead,Mortality Rate
+Concentration (micromolar),Grp 1 All ,Grp 1 Dead,Grp 1 Mortality Rate,Grp 2 All,Grp 2 Dead,Grp 2 Mortality Rate,Grp 3 All ,Grp 3 Dead,Grp 3 Mortality Rate,Grp 4 All ,Grp 4 Dead,Grp 4 Mortality Rate,Grp 5 All ,Grp 5 Dead,Grp 5 Mortality Rate,Grp 6 All ,Grp 6 Dead,Grp 6 Mortality Rate
 0,883,24,0.027180068,1354,115,0.08493353,1316,161,0.122340426,1387,58,0.041816871,1445,260,0.179930796,1490,55,0.036912752
 0.001,892,13,0.014573991,1126,105,0.093250444,1685,300,0.178041543,1566,100,0.06385696,1655,46,0.027794562,1526,114,0.074705111
 0.01,987,27,0.027355623,1593,79,0.049591965,1354,221,0.163220089,1774,77,0.043404735,1759,108,0.061398522,2235,61,0.027293065
