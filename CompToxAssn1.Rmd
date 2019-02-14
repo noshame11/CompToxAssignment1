@@ -35,6 +35,7 @@ predict(pred1, type = "response")
 pred1 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
 
 ## Replication 2
 lo2 <- loess(mortality$`Grp 2 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -58,6 +59,7 @@ predict(pred2, type = "response")
 pred2 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 2 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 2 Mortality Rate`, Fitted = fitted(fit2), Predicted = predict(pred2, type = "response"))
 
 ## Replication 3
 lo3 <- loess(mortality$`Grp 3 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -81,6 +83,7 @@ predict(pred3, type = "response")
 pred3 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 3 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 3 Mortality Rate`, Fitted = fitted(fit3), Predicted = predict(pred3, type = "response"))
 
 ## Replication 4
 lo4 <- loess(mortality$`Grp 4 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -104,6 +107,7 @@ predict(pred4, type = "response")
 pred4 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 4 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 4 Mortality Rate`, Fitted = fitted(fit4), Predicted = predict(pred4, type = "response"))
 
 ## Replication 5
 lo5 <- loess(mortality$`Grp 5 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -127,6 +131,7 @@ predict(pred5, type = "response")
 pred5 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 5 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 5 Mortality Rate`, Fitted = fitted(fit5), Predicted = predict(pred5, type = "response"))
 
 ## Replication 6
 lo6 <- loess(mortality$`Grp 6 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -150,3 +155,4 @@ predict(pred6, type = "response")
 pred6 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 6 Mortality Rate`))
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 6 Mortality Rate`, Fitted = fitted(fit6), Predicted = predict(pred6, type = "response"))
