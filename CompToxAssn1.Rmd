@@ -11,6 +11,7 @@ library(broom)
 library(httk)
 library(drc)
 library(ggplot2)
+library(GGally)
 mortality = read_csv("./RotenoneMortalityRate.csv")
 
 ## Replication 1
@@ -36,6 +37,8 @@ pred1 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
+ggpairs(data = mortality, columns = 1:4, title="Group 1 Mortality Data - relationship between predictor and response variables")
+
 
 ## Replication 2
 lo2 <- loess(mortality$`Grp 2 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -60,13 +63,15 @@ pred2 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 2 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 2 Mortality Rate`, Fitted = fitted(fit2), Predicted = predict(pred2, type = "response"))
+col.index2 = c(1,5,6,7)
+ggpairs(data = mortality, columns = col.index2, title="Group 2 Mortality Data - relationship between predictor and response variables")
 
 ## Replication 3
 lo3 <- loess(mortality$`Grp 3 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 3 Mortality Rate`,
      main = "Replication 3", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
-     ylim = c(0, 0.45))
+     ylim = c(0, 0.4))
 x3 = seq(min(mortality$`Concentration (micromolar)`),
          max(mortality$`Concentration (micromolar)`), 
          (max(mortality$`Concentration (micromolar)`) -
@@ -84,6 +89,8 @@ pred3 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 3 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 3 Mortality Rate`, Fitted = fitted(fit3), Predicted = predict(pred3, type = "response"))
+col.index2 = c(1,8,9,10)
+ggpairs(data = mortality, columns = col.index2, title="Group 3 Mortality Data - relationship between predictor and response variables")
 
 ## Replication 4
 lo4 <- loess(mortality$`Grp 4 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -108,6 +115,8 @@ pred4 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 4 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 4 Mortality Rate`, Fitted = fitted(fit4), Predicted = predict(pred4, type = "response"))
+col.index2 = c(1,11,12,13)
+ggpairs(data = mortality, columns = col.index2, title="Group 4 Mortality Data - relationship between predictor and response variables")
 
 ## Replication 5
 lo5 <- loess(mortality$`Grp 5 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -132,13 +141,15 @@ pred5 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 5 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 5 Mortality Rate`, Fitted = fitted(fit5), Predicted = predict(pred5, type = "response"))
+col.index2 = c(1,14,15,16)
+ggpairs(data = mortality, columns = col.index2, title="Group 5 Mortality Data - relationship between predictor and response variables")
 
 ## Replication 6
 lo6 <- loess(mortality$`Grp 6 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 6 Mortality Rate`,
      main = "Replication 6", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
-     ylim = c(0, 0.5))
+     ylim = c(0, 0.55))
 x6 = seq(min(mortality$`Concentration (micromolar)`),
          max(mortality$`Concentration (micromolar)`), 
          (max(mortality$`Concentration (micromolar)`) -
@@ -156,3 +167,5 @@ pred6 %>%
   broom::tidy()
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 6 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 6 Mortality Rate`, Fitted = fitted(fit6), Predicted = predict(pred6, type = "response"))
+col.index2 = c(1,17,18,19)
+ggpairs(data = mortality, columns = col.index2, title="Group 6 Mortality Data - relationship between predictor and response variables")
