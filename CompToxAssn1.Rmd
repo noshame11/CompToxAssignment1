@@ -16,7 +16,7 @@ mortality = read_csv("./RotenoneMortalityRate.csv")
 ## Replication 1
 lo1 <- loess(mortality$`Grp 1 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 1 Mortality Rate`,
-     main = "Replication 1", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 1", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.45))
 x1 = seq(min(mortality$`Concentration (micromolar)`),
@@ -39,7 +39,7 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Ra
 ## Replication 2
 lo2 <- loess(mortality$`Grp 2 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 2 Mortality Rate`,
-     main = "Replication 2", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 2", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.45))
 x2 = seq(min(mortality$`Concentration (micromolar)`),
@@ -62,7 +62,7 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 2 Mortality Ra
 ## Replication 3
 lo3 <- loess(mortality$`Grp 3 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 3 Mortality Rate`,
-     main = "Replication 3", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 3", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.45))
 x3 = seq(min(mortality$`Concentration (micromolar)`),
@@ -85,7 +85,7 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 3 Mortality Ra
 ## Replication 4
 lo4 <- loess(mortality$`Grp 4 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 4 Mortality Rate`,
-     main = "Replication 4", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 4", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.5))
 x4 = seq(min(mortality$`Concentration (micromolar)`),
@@ -108,7 +108,7 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 4 Mortality Ra
 ## Replication 5
 lo5 <- loess(mortality$`Grp 5 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 5 Mortality Rate`,
-     main = "Replication 5", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 5", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.45))
 x5 = seq(min(mortality$`Concentration (micromolar)`),
@@ -131,7 +131,7 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 5 Mortality Ra
 ## Replication 6
 lo6 <- loess(mortality$`Grp 6 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 6 Mortality Rate`,
-     main = "Replication 6", sub = "Rotenone Conc on Mortality Rate",
+     main = "Replication 6", sub = "Rotenone Dose-Response Curve",
      xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
      ylim = c(0, 0.5))
 x6 = seq(min(mortality$`Concentration (micromolar)`),
