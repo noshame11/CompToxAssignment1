@@ -6,6 +6,8 @@ output: github_document
 ---
 
 ```{r}
+## non-linear regression, use dead data instead of mortality rate
+## x-axis in log value
 library(tidyverse)
 library(janitor)
 library(broom)
@@ -14,6 +16,7 @@ library(drc)
 library(ggplot2)
 library(GGally)
 library(scatterplot3d)
+library(MASS)
 mortality = read_csv("./RotenoneMortalityRate.csv")
 
 ## Replication 1
@@ -37,20 +40,21 @@ summary(pred1)
 predict(pred1, type = "response")
 pred1 %>%
   broom::tidy()
+dose.p(pred1,p = 0.5)
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
-ggpairs(data = mortality, columns = 1:4, title="Group 1 Mortality Data - relationship between predictor and response variables")
-ggplot(data=mortality, aes(fit1$residuals)) + 
+ggpairs(data = mortality, columns = 1:4, title = "Group 1 Mortality Data - relationship between predictor and response variables")
+ggplot(data = mortality, aes(fit1$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 1 Fitted Model Residuals") 
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 1 Linear Model Fitted to Data")
 
 ## Replication 2
