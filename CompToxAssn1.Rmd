@@ -5,6 +5,7 @@ date: "February 12, 2019"
 output: github_document
 ---
 
+```{r}
 library(tidyverse)
 library(janitor)
 library(broom)
@@ -12,6 +13,7 @@ library(httk)
 library(drc)
 library(ggplot2)
 library(GGally)
+library(scatterplot3d)
 mortality = read_csv("./RotenoneMortalityRate.csv")
 
 ## Replication 1
@@ -38,7 +40,18 @@ pred1 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
 ggpairs(data = mortality, columns = 1:4, title="Group 1 Mortality Data - relationship between predictor and response variables")
-
+ggplot(data=mortality, aes(fit1$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 1 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 1 Linear Model Fitted to Data")
 
 ## Replication 2
 lo2 <- loess(mortality$`Grp 2 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -65,6 +78,18 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 2 Mortality Ra
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 2 Mortality Rate`, Fitted = fitted(fit2), Predicted = predict(pred2, type = "response"))
 col.index2 = c(1,5,6,7)
 ggpairs(data = mortality, columns = col.index2, title="Group 2 Mortality Data - relationship between predictor and response variables")
+ggplot(data=mortality, aes(fit2$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 2 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 2 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 2 Linear Model Fitted to Data")
 
 ## Replication 3
 lo3 <- loess(mortality$`Grp 3 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -91,6 +116,18 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 3 Mortality Ra
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 3 Mortality Rate`, Fitted = fitted(fit3), Predicted = predict(pred3, type = "response"))
 col.index2 = c(1,8,9,10)
 ggpairs(data = mortality, columns = col.index2, title="Group 3 Mortality Data - relationship between predictor and response variables")
+ggplot(data=mortality, aes(fit3$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 3 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 3 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 3 Linear Model Fitted to Data")
 
 ## Replication 4
 lo4 <- loess(mortality$`Grp 4 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -117,7 +154,19 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 4 Mortality Ra
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 4 Mortality Rate`, Fitted = fitted(fit4), Predicted = predict(pred4, type = "response"))
 col.index2 = c(1,11,12,13)
 ggpairs(data = mortality, columns = col.index2, title="Group 4 Mortality Data - relationship between predictor and response variables")
-
+ggplot(data=mortality, aes(fit4$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 4 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 4 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 4 Linear Model Fitted to Data")
+  
 ## Replication 5
 lo5 <- loess(mortality$`Grp 5 Mortality Rate`~mortality$`Concentration (micromolar)`)
 plot(mortality$`Concentration (micromolar)`, mortality$`Grp 5 Mortality Rate`,
@@ -143,6 +192,18 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 5 Mortality Ra
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 5 Mortality Rate`, Fitted = fitted(fit5), Predicted = predict(pred5, type = "response"))
 col.index2 = c(1,14,15,16)
 ggpairs(data = mortality, columns = col.index2, title="Group 5 Mortality Data - relationship between predictor and response variables")
+ggplot(data=mortality, aes(fit5$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 5 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 5 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 5 Linear Model Fitted to Data")
 
 ## Replication 6
 lo6 <- loess(mortality$`Grp 6 Mortality Rate`~mortality$`Concentration (micromolar)`)
@@ -169,3 +230,16 @@ abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 6 Mortality Ra
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 6 Mortality Rate`, Fitted = fitted(fit6), Predicted = predict(pred6, type = "response"))
 col.index2 = c(1,17,18,19)
 ggpairs(data = mortality, columns = col.index2, title="Group 6 Mortality Data - relationship between predictor and response variables")
+ggplot(data=mortality, aes(fit6$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Histogram for Group 6 Fitted Model Residuals") 
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 6 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x=element_line(),
+        axis.line.y=element_line()) +
+  ggtitle("Replication 6 Linear Model Fitted to Data")
+```
