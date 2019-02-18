@@ -4,10 +4,12 @@ Vincent Tam
 February 12, 2019
 
 ``` r
+## non-linear regression, use dead data instead of mortality rate
+## x-axis in log value
 library(tidyverse)
 ```
 
-    ## -- Attaching packages --------------------------------------------------- tidyverse 1.2.1 --
+    ## -- Attaching packages ---------------------------------------- tidyverse 1.2.1 --
 
     ## v ggplot2 3.1.0     v purrr   0.2.5
     ## v tibble  2.0.1     v dplyr   0.7.8
@@ -26,7 +28,7 @@ library(tidyverse)
 
     ## Warning: package 'dplyr' was built under R version 3.5.2
 
-    ## -- Conflicts ------------------------------------------------------ tidyverse_conflicts() --
+    ## -- Conflicts ------------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -50,6 +52,8 @@ library(drc)
     ## Warning: package 'drc' was built under R version 3.5.2
 
     ## Loading required package: MASS
+
+    ## Warning: package 'MASS' was built under R version 3.5.2
 
     ## 
     ## Attaching package: 'MASS'
@@ -93,31 +97,175 @@ library(scatterplot3d)
     ## Warning: package 'scatterplot3d' was built under R version 3.5.2
 
 ``` r
-mortality = read_csv("./RotenoneMortalityRate.csv")
+library(MASS)
+par(mar = c(1,1,1,1))
+mortality = read_csv("./RotenoneMortalityRateLogged.csv")
 ```
 
     ## Parsed with column specification:
     ## cols(
-    ##   `Concentration (micromolar)` = col_double(),
-    ##   `Grp 1 All` = col_double(),
-    ##   `Grp 1 Dead` = col_double(),
-    ##   `Grp 1 Mortality Rate` = col_double(),
-    ##   `Grp 2 All` = col_double(),
-    ##   `Grp 2 Dead` = col_double(),
-    ##   `Grp 2 Mortality Rate` = col_double(),
-    ##   `Grp 3 All` = col_double(),
-    ##   `Grp 3 Dead` = col_double(),
-    ##   `Grp 3 Mortality Rate` = col_double(),
-    ##   `Grp 4 All` = col_double(),
-    ##   `Grp 4 Dead` = col_double(),
-    ##   `Grp 4 Mortality Rate` = col_double(),
-    ##   `Grp 5 All` = col_double(),
-    ##   `Grp 5 Dead` = col_double(),
-    ##   `Grp 5 Mortality Rate` = col_double(),
-    ##   `Grp 6 All` = col_double(),
-    ##   `Grp 6 Dead` = col_double(),
-    ##   `Grp 6 Mortality Rate` = col_double()
+    ##   .default = col_double()
     ## )
+
+    ## See spec(...) for full column specifications.
+
+``` r
+## Replication 1 - Logged Concentration Test Code
+## Local Regression - 50% smoothing span
+lo1 <- loess(mortality$`Grp 1 Mortality Rate`~mortality$`Concentration (micromolar)`, span = 0.50)
+plot(mortality$`Concentration (micromolar)`, mortality$`Grp 1 Mortality Rate`,
+     main = "Replication 1", sub = "Rotenone Dose-Response Curve",
+     xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
+     ylim = c(0, 0.45))
+x1 = seq(min(mortality$`Concentration (micromolar)`),
+         max(mortality$`Concentration (micromolar)`), 
+         (max(mortality$`Concentration (micromolar)`) -
+         min(mortality$`Concentration (micromolar)`))/1000)
+lines(x1, predict(lo1,x1), col = 'red', lwd = 2)
+fit1 = lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`) 
+summary(fit1)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.2022 -0.8268 -0.4406 -0.1633  3.8431 
+    ## 
+    ## Coefficients:
+    ##                                  Estimate Std. Error t value Pr(>|t|)
+    ## (Intercept)                       0.08094    0.98679   0.082    0.937
+    ## mortality$`Grp 1 Mortality Rate`  4.81883    4.72512   1.020    0.338
+    ## 
+    ## Residual standard error: 1.62 on 8 degrees of freedom
+    ## Multiple R-squared:  0.115,  Adjusted R-squared:  0.004431 
+    ## F-statistic:  1.04 on 1 and 8 DF,  p-value: 0.3377
+
+``` r
+fitted(fit1)
+```
+
+    ##         1         2         3         4         5         6         7 
+    ## 0.2119115 0.1511649 0.2127575 0.9039991 1.3022028 1.3610147 1.2453370 
+    ##         8         9        10 
+    ## 1.6692049 1.1965491 1.1568585
+
+``` r
+fit1 %>% 
+  broom::tidy()
+```
+
+    ## # A tibble: 2 x 5
+    ##   term                             estimate std.error statistic p.value
+    ##   <chr>                               <dbl>     <dbl>     <dbl>   <dbl>
+    ## 1 (Intercept)                        0.0809     0.987    0.0820   0.937
+    ## 2 mortality$`Grp 1 Mortality Rate`   4.82       4.73     1.02     0.338
+
+``` r
+pred1 = glm(factor(mortality$`Concentration (micromolar)`) ~ mortality$`Grp 1 Mortality Rate`, family = binomial(link = "logit"))
+summary(pred1)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = factor(mortality$`Concentration (micromolar)`) ~ 
+    ##     mortality$`Grp 1 Mortality Rate`, family = binomial(link = "logit"))
+    ## 
+    ## Deviance Residuals: 
+    ##      Min        1Q    Median        3Q       Max  
+    ## -1.54673   0.05413   0.07411   0.14427   0.96164  
+    ## 
+    ## Coefficients:
+    ##                                  Estimate Std. Error z value Pr(>|z|)
+    ## (Intercept)                        0.1789     1.5701   0.114    0.909
+    ## mortality$`Grp 1 Mortality Rate`  24.1835    33.6554   0.719    0.472
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 6.5017  on 9  degrees of freedom
+    ## Residual deviance: 4.0868  on 8  degrees of freedom
+    ## AIC: 8.0868
+    ## 
+    ## Number of Fisher Scoring iterations: 8
+
+``` r
+predict(pred1, type = "response")
+```
+
+    ##         1         2         3         4         5         6         7 
+    ## 0.6976561 0.6297867 0.6985508 0.9867371 0.9981813 0.9986455 0.9975821 
+    ##         8         9        10 
+    ## 0.9997112 0.9969134 0.9962357
+
+``` r
+pred1 %>%
+  broom::tidy()
+```
+
+    ## # A tibble: 2 x 5
+    ##   term                             estimate std.error statistic p.value
+    ##   <chr>                               <dbl>     <dbl>     <dbl>   <dbl>
+    ## 1 (Intercept)                         0.179      1.57     0.114   0.909
+    ## 2 mortality$`Grp 1 Mortality Rate`   24.2       33.7      0.719   0.472
+
+``` r
+dose.p(pred1,p = 0.5)
+```
+
+    ##                 Dose         SE
+    ## p = 0.5: -0.00739562 0.07190727
+
+``` r
+abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
+```
+
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-1.png)
+
+``` r
+data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
+```
+
+    ##    Concentration  Mortality    Fitted Predicted
+    ## 1          0.000 0.02718007 0.2119115 0.6976561
+    ## 2          0.001 0.01457399 0.1511649 0.6297867
+    ## 3          0.010 0.02735562 0.2127575 0.6985508
+    ## 4          0.050 0.17080153 0.9039991 0.9867371
+    ## 5          0.100 0.25343643 1.3022028 0.9981813
+    ## 6          0.250 0.26564103 1.3610147 0.9986455
+    ## 7          0.500 0.24163569 1.2453370 0.9975821
+    ## 8          1.000 0.32959641 1.6692049 0.9997112
+    ## 9          2.500 0.23151125 1.1965491 0.9969134
+    ## 10         5.000 0.22327470 1.1568585 0.9962357
+
+``` r
+ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relationship between predictor and response variables")
+```
+
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-2.png)
+
+``` r
+ggplot(data = mortality, aes(fit1$residuals)) + 
+  geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
+  ggtitle("Histogram for Group 1 Fitted Model Residuals") 
+```
+
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-3.png)
+
+``` r
+ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
+  stat_smooth(method = "lm", col = "dodgerblue3") +
+  theme(panel.background = element_rect(fill = "white"),
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
+  ggtitle("Replication 1 Linear Model Fitted to Data")
+```
+
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-4.png)
 
 ``` r
 ## Replication 1
@@ -220,10 +368,17 @@ pred1 %>%
     ## 2 mortality$`Grp 1 Mortality Rate`   24.2       33.7      0.719   0.472
 
 ``` r
+dose.p(pred1,p = 0.5)
+```
+
+    ##                 Dose         SE
+    ## p = 0.5: -0.00739562 0.07190727
+
+``` r
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-1.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-5.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
@@ -242,32 +397,32 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.22327470 1.1568585 0.9962357
 
 ``` r
-ggpairs(data = mortality, columns = 1:4, title="Group 1 Mortality Data - relationship between predictor and response variables")
+ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-2.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-6.png)
 
 ``` r
-ggplot(data=mortality, aes(fit1$residuals)) + 
+ggplot(data = mortality, aes(fit1$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 1 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-3.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-7.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 1 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-4.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-8.png)
 
 ``` r
 ## Replication 2
@@ -373,7 +528,7 @@ pred2 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 2 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-5.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-9.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 2 Mortality Rate`, Fitted = fitted(fit2), Predicted = predict(pred2, type = "response"))
@@ -392,33 +547,33 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.26200418 1.1194344 0.9894037
 
 ``` r
-col.index2 = c(1,5,6,7)
-ggpairs(data = mortality, columns = col.index2, title="Group 2 Mortality Data - relationship between predictor and response variables")
+col.index2 = c(1,2,6,7,8)
+ggpairs(data = mortality, columns = col.index2, title = "Group 2 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-6.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-10.png)
 
 ``` r
-ggplot(data=mortality, aes(fit2$residuals)) + 
+ggplot(data = mortality, aes(fit2$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 2 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-7.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-11.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 2 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 2 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-8.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-12.png)
 
 ``` r
 ## Replication 3
@@ -524,7 +679,7 @@ pred3 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 3 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-9.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-13.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 3 Mortality Rate`, Fitted = fitted(fit3), Predicted = predict(pred3, type = "response"))
@@ -543,33 +698,33 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.28224974  1.3576219 0.9847573
 
 ``` r
-col.index2 = c(1,8,9,10)
-ggpairs(data = mortality, columns = col.index2, title="Group 3 Mortality Data - relationship between predictor and response variables")
+col.index2 = c(1,2,9,10,11)
+ggpairs(data = mortality, columns = col.index2, title = "Group 3 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-10.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-14.png)
 
 ``` r
-ggplot(data=mortality, aes(fit3$residuals)) + 
+ggplot(data = mortality, aes(fit3$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 3 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-11.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-15.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 3 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 3 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-12.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-16.png)
 
 ``` r
 ## Replication 4
@@ -682,7 +837,7 @@ pred4 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 4 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-13.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-17.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 4 Mortality Rate`, Fitted = fitted(fit4), Predicted = predict(pred4, type = "response"))
@@ -701,33 +856,33 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.29348411  1.52223198 1.000000e+00
 
 ``` r
-col.index2 = c(1,11,12,13)
-ggpairs(data = mortality, columns = col.index2, title="Group 4 Mortality Data - relationship between predictor and response variables")
+col.index2 = c(1,2,12,13,14)
+ggpairs(data = mortality, columns = col.index2, title = "Group 4 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-14.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-18.png)
 
 ``` r
-ggplot(data=mortality, aes(fit4$residuals)) + 
+ggplot(data = mortality, aes(fit4$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 4 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-15.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-19.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 4 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 4 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-16.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-20.png)
 
 ``` r
 ## Replication 5
@@ -833,7 +988,7 @@ pred5 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 5 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-17.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-21.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 5 Mortality Rate`, Fitted = fitted(fit5), Predicted = predict(pred5, type = "response"))
@@ -852,33 +1007,33 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.20989975 0.9663041 0.9033426
 
 ``` r
-col.index2 = c(1,14,15,16)
-ggpairs(data = mortality, columns = col.index2, title="Group 5 Mortality Data - relationship between predictor and response variables")
+col.index2 = c(1,2,15,16,17)
+ggpairs(data = mortality, columns = col.index2, title = "Group 5 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-18.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-22.png)
 
 ``` r
-ggplot(data=mortality, aes(fit5$residuals)) + 
+ggplot(data = mortality, aes(fit5$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 5 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-19.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-23.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 5 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 5 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-20.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-24.png)
 
 ``` r
 ## Replication 6
@@ -984,7 +1139,7 @@ pred6 %>%
 abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 6 Mortality Rate`))
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-21.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-25.png)
 
 ``` r
 data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 6 Mortality Rate`, Fitted = fitted(fit6), Predicted = predict(pred6, type = "response"))
@@ -1003,30 +1158,30 @@ data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = m
     ## 10         5.000 0.21323529 0.9827616 0.9999281
 
 ``` r
-col.index2 = c(1,17,18,19)
-ggpairs(data = mortality, columns = col.index2, title="Group 6 Mortality Data - relationship between predictor and response variables")
+col.index2 = c(1,2,18,19,20)
+ggpairs(data = mortality, columns = col.index2, title = "Group 6 Mortality Data - relationship between predictor and response variables")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-22.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-26.png)
 
 ``` r
-ggplot(data=mortality, aes(fit6$residuals)) + 
+ggplot(data = mortality, aes(fit6$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Histogram for Group 6 Fitted Model Residuals") 
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-23.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-27.png)
 
 ``` r
 ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 6 Mortality Rate`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
-        axis.line.x=element_line(),
-        axis.line.y=element_line()) +
+        axis.line.x = element_line(),
+        axis.line.y = element_line()) +
   ggtitle("Replication 6 Linear Model Fitted to Data")
 ```
 
-![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-24.png)
+![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-28.png)
