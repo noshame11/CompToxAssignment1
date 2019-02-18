@@ -15,44 +15,35 @@ library(httk)
 library(drc)
 library(ggplot2)
 library(GGally)
-library(scatterplot3d)
 library(MASS)
 par(mar = c(1,1,1,1))
 mortality = read_csv("./RotenoneMortalityRateLogged.csv")
 
 ## Replication 1 - Logged Concentration Test Code
-## Local Regression - 50% smoothing span
-lo1 <- loess(mortality$`Grp 1 Mortality Rate`~mortality$`Concentration (micromolar)`, span = 0.50)
-plot(mortality$`Concentration (micromolar)`, mortality$`Grp 1 Mortality Rate`,
-     main = "Replication 1", sub = "Rotenone Dose-Response Curve",
-     xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
-     ylim = c(0, 0.45))
-x1 = seq(min(mortality$`Concentration (micromolar)`),
-         max(mortality$`Concentration (micromolar)`), 
-         (max(mortality$`Concentration (micromolar)`) -
-         min(mortality$`Concentration (micromolar)`))/1000)
-lines(x1, predict(lo1,x1), col = 'red', lwd = 2)
-fit1 = lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`) 
-summary(fit1)
-fitted(fit1)
-fit1 %>% 
+## Local Regression - 50% smoothing span of Log Concentration with Dead
+normplot = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)) +
+    geom_point(size = 2) + geom_smooth(span = 0.5)
+  normplot + scale_x_log10() + xlim(-10, 10) + labs(title = "Replication 1, Rotenone   Dose-Response Curve")
+fit1log = lm(mortality$`Log Concentration (micromolar)` ~ mortality$`Grp 1 Dead`) 
+summary(fit1log)
+fitted(fit1log)
+fit1log %>% 
   broom::tidy()
-pred1 = glm(factor(mortality$`Concentration (micromolar)`) ~ mortality$`Grp 1 Mortality Rate`, family = binomial(link = "logit"))
-summary(pred1)
-predict(pred1, type = "response")
-pred1 %>%
+pred1log = glm(factor(mortality$`Log Concentration (micromolar)`) ~ mortality$`Grp 1 Dead`, family = binomial(link = "logit"))
+summary(pred1log)
+predict(pred1log, type = "response")
+pred1log %>%
   broom::tidy()
-dose.p(pred1,p = 0.5)
-abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
-data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
+dose.p(pred1log,p = 0.5)
+data.frame(Concentration = mortality$`Log Concentration (micromolar)`, Mortality = mortality$`Grp 1 Dead`, Fitted = fitted(fit1log), Predicted = predict(pred1log, type = "response"))
 ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relationship between predictor and response variables")
-ggplot(data = mortality, aes(fit1$residuals)) + 
+ggplot(data = mortality, aes(fit1log$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
         axis.line.x = element_line(),
         axis.line.y = element_line()) +
   ggtitle("Histogram for Group 1 Fitted Model Residuals") 
-ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
+ggplot(data = mortality, aes(x = `Log Concentration (micromolar)`, y = `Grp 1 Dead`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
         axis.line.x = element_line(),

@@ -11,10 +11,10 @@ library(tidyverse)
 
     ## -- Attaching packages ---------------------------------------- tidyverse 1.2.1 --
 
-    ## v ggplot2 3.1.0     v purrr   0.2.5
-    ## v tibble  2.0.1     v dplyr   0.7.8
-    ## v tidyr   0.8.2     v stringr 1.3.1
-    ## v readr   1.3.1     v forcats 0.3.0
+    ## v ggplot2 3.1.0       v purrr   0.3.0  
+    ## v tibble  2.0.1       v dplyr   0.8.0.1
+    ## v tidyr   0.8.2       v stringr 1.4.0  
+    ## v readr   1.3.1       v forcats 0.4.0
 
     ## Warning: package 'ggplot2' was built under R version 3.5.2
 
@@ -27,6 +27,10 @@ library(tidyverse)
     ## Warning: package 'purrr' was built under R version 3.5.2
 
     ## Warning: package 'dplyr' was built under R version 3.5.2
+
+    ## Warning: package 'stringr' was built under R version 3.5.2
+
+    ## Warning: package 'forcats' was built under R version 3.5.2
 
     ## -- Conflicts ------------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
@@ -91,12 +95,6 @@ library(GGally)
     ##     nasa
 
 ``` r
-library(scatterplot3d)
-```
-
-    ## Warning: package 'scatterplot3d' was built under R version 3.5.2
-
-``` r
 library(MASS)
 par(mar = c(1,1,1,1))
 mortality = read_csv("./RotenoneMortalityRateLogged.csv")
@@ -111,133 +109,139 @@ mortality = read_csv("./RotenoneMortalityRateLogged.csv")
 
 ``` r
 ## Replication 1 - Logged Concentration Test Code
-## Local Regression - 50% smoothing span
-lo1 <- loess(mortality$`Grp 1 Mortality Rate`~mortality$`Concentration (micromolar)`, span = 0.50)
-plot(mortality$`Concentration (micromolar)`, mortality$`Grp 1 Mortality Rate`,
-     main = "Replication 1", sub = "Rotenone Dose-Response Curve",
-     xlab = "Rotenone Concentration (micromolar)", ylab = "Mortality Rate",
-     ylim = c(0, 0.45))
-x1 = seq(min(mortality$`Concentration (micromolar)`),
-         max(mortality$`Concentration (micromolar)`), 
-         (max(mortality$`Concentration (micromolar)`) -
-         min(mortality$`Concentration (micromolar)`))/1000)
-lines(x1, predict(lo1,x1), col = 'red', lwd = 2)
-fit1 = lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`) 
-summary(fit1)
+## Local Regression - 50% smoothing span of Log Concentration with Dead
+normplot = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)) +
+    geom_point(size = 2) + geom_smooth(span = 0.5)
+  normplot + scale_x_log10() + xlim(-10, 10) + labs(title = "Replication 1, Rotenone   Dose-Response Curve")
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -1.2022 -0.8268 -0.4406 -0.1633  3.8431 
-    ## 
-    ## Coefficients:
-    ##                                  Estimate Std. Error t value Pr(>|t|)
-    ## (Intercept)                       0.08094    0.98679   0.082    0.937
-    ## mortality$`Grp 1 Mortality Rate`  4.81883    4.72512   1.020    0.338
-    ## 
-    ## Residual standard error: 1.62 on 8 degrees of freedom
-    ## Multiple R-squared:  0.115,  Adjusted R-squared:  0.004431 
-    ## F-statistic:  1.04 on 1 and 8 DF,  p-value: 0.3377
+    ## Scale for 'x' is already present. Adding another scale for 'x', which
+    ## will replace the existing scale.
 
-``` r
-fitted(fit1)
-```
-
-    ##         1         2         3         4         5         6         7 
-    ## 0.2119115 0.1511649 0.2127575 0.9039991 1.3022028 1.3610147 1.2453370 
-    ##         8         9        10 
-    ## 1.6692049 1.1965491 1.1568585
-
-``` r
-fit1 %>% 
-  broom::tidy()
-```
-
-    ## # A tibble: 2 x 5
-    ##   term                             estimate std.error statistic p.value
-    ##   <chr>                               <dbl>     <dbl>     <dbl>   <dbl>
-    ## 1 (Intercept)                        0.0809     0.987    0.0820   0.937
-    ## 2 mortality$`Grp 1 Mortality Rate`   4.82       4.73     1.02     0.338
-
-``` r
-pred1 = glm(factor(mortality$`Concentration (micromolar)`) ~ mortality$`Grp 1 Mortality Rate`, family = binomial(link = "logit"))
-summary(pred1)
-```
-
-    ## 
-    ## Call:
-    ## glm(formula = factor(mortality$`Concentration (micromolar)`) ~ 
-    ##     mortality$`Grp 1 Mortality Rate`, family = binomial(link = "logit"))
-    ## 
-    ## Deviance Residuals: 
-    ##      Min        1Q    Median        3Q       Max  
-    ## -1.54673   0.05413   0.07411   0.14427   0.96164  
-    ## 
-    ## Coefficients:
-    ##                                  Estimate Std. Error z value Pr(>|z|)
-    ## (Intercept)                        0.1789     1.5701   0.114    0.909
-    ## mortality$`Grp 1 Mortality Rate`  24.1835    33.6554   0.719    0.472
-    ## 
-    ## (Dispersion parameter for binomial family taken to be 1)
-    ## 
-    ##     Null deviance: 6.5017  on 9  degrees of freedom
-    ## Residual deviance: 4.0868  on 8  degrees of freedom
-    ## AIC: 8.0868
-    ## 
-    ## Number of Fisher Scoring iterations: 8
-
-``` r
-predict(pred1, type = "response")
-```
-
-    ##         1         2         3         4         5         6         7 
-    ## 0.6976561 0.6297867 0.6985508 0.9867371 0.9981813 0.9986455 0.9975821 
-    ##         8         9        10 
-    ## 0.9997112 0.9969134 0.9962357
-
-``` r
-pred1 %>%
-  broom::tidy()
-```
-
-    ## # A tibble: 2 x 5
-    ##   term                             estimate std.error statistic p.value
-    ##   <chr>                               <dbl>     <dbl>     <dbl>   <dbl>
-    ## 1 (Intercept)                         0.179      1.57     0.114   0.909
-    ## 2 mortality$`Grp 1 Mortality Rate`   24.2       33.7      0.719   0.472
-
-``` r
-dose.p(pred1,p = 0.5)
-```
-
-    ##                 Dose         SE
-    ## p = 0.5: -0.00739562 0.07190727
-
-``` r
-abline(lm(mortality$`Concentration (micromolar)` ~ mortality$`Grp 1 Mortality Rate`))
-```
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
 ``` r
-data.frame(Concentration = mortality$`Concentration (micromolar)`, Mortality = mortality$`Grp 1 Mortality Rate`, Fitted = fitted(fit1), Predicted = predict(pred1, type = "response"))
+fit1log = lm(mortality$`Log Concentration (micromolar)` ~ mortality$`Grp 1 Dead`) 
+summary(fit1log)
 ```
 
-    ##    Concentration  Mortality    Fitted Predicted
-    ## 1          0.000 0.02718007 0.2119115 0.6976561
-    ## 2          0.001 0.01457399 0.1511649 0.6297867
-    ## 3          0.010 0.02735562 0.2127575 0.6985508
-    ## 4          0.050 0.17080153 0.9039991 0.9867371
-    ## 5          0.100 0.25343643 1.3022028 0.9981813
-    ## 6          0.250 0.26564103 1.3610147 0.9986455
-    ## 7          0.500 0.24163569 1.2453370 0.9975821
-    ## 8          1.000 0.32959641 1.6692049 0.9997112
-    ## 9          2.500 0.23151125 1.1965491 0.9969134
-    ## 10         5.000 0.22327470 1.1568585 0.9962357
+    ## 
+    ## Call:
+    ## lm(formula = mortality$`Log Concentration (micromolar)` ~ mortality$`Grp 1 Dead`)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -1.6365 -0.6935 -0.1116  0.9462  1.3852 
+    ## 
+    ## Coefficients:
+    ##                         Estimate Std. Error t value Pr(>|t|)  
+    ## (Intercept)            -1.421424   0.640983  -2.218   0.0574 .
+    ## mortality$`Grp 1 Dead`  0.004456   0.003378   1.319   0.2237  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.098 on 8 degrees of freedom
+    ## Multiple R-squared:  0.1786, Adjusted R-squared:  0.07596 
+    ## F-statistic:  1.74 on 1 and 8 DF,  p-value: 0.2237
+
+``` r
+fitted(fit1log)
+```
+
+    ##          1          2          3          4          5          6 
+    ## -1.3144841 -1.3634981 -1.3011166 -0.6238326 -0.1069579 -0.2673673 
+    ##          7          8          9         10 
+    ## -0.5525395 -0.1114137 -0.7797861 -0.6862140
+
+``` r
+fit1log %>% 
+  broom::tidy()
+```
+
+    ## # A tibble: 2 x 5
+    ##   term                   estimate std.error statistic p.value
+    ##   <chr>                     <dbl>     <dbl>     <dbl>   <dbl>
+    ## 1 (Intercept)            -1.42      0.641       -2.22  0.0574
+    ## 2 mortality$`Grp 1 Dead`  0.00446   0.00338      1.32  0.224
+
+``` r
+pred1log = glm(factor(mortality$`Log Concentration (micromolar)`) ~ mortality$`Grp 1 Dead`, family = binomial(link = "logit"))
+```
+
+    ## Warning: glm.fit: algorithm did not converge
+
+    ## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
+
+``` r
+summary(pred1log)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = factor(mortality$`Log Concentration (micromolar)`) ~ 
+    ##     mortality$`Grp 1 Dead`, family = binomial(link = "logit"))
+    ## 
+    ## Deviance Residuals: 
+    ##        Min          1Q      Median          3Q         Max  
+    ## -5.176e-05   2.100e-08   2.100e-08   2.100e-08   6.247e-05  
+    ## 
+    ## Coefficients:
+    ##                         Estimate Std. Error z value Pr(>|z|)
+    ## (Intercept)              -68.278  39632.039  -0.002    0.999
+    ## mortality$`Grp 1 Dead`     3.681   1956.504   0.002    0.998
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 6.5017e+00  on 9  degrees of freedom
+    ## Residual deviance: 6.5811e-09  on 8  degrees of freedom
+    ## AIC: 4
+    ## 
+    ## Number of Fisher Scoring iterations: 25
+
+``` r
+predict(pred1log, type = "response")
+```
+
+    ##            1            2            3            4            5 
+    ## 1.000000e+00 1.339598e-09 1.000000e+00 1.000000e+00 1.000000e+00 
+    ##            6            7            8            9           10 
+    ## 1.000000e+00 1.000000e+00 1.000000e+00 1.000000e+00 1.000000e+00
+
+``` r
+pred1log %>%
+  broom::tidy()
+```
+
+    ## # A tibble: 2 x 5
+    ##   term                   estimate std.error statistic p.value
+    ##   <chr>                     <dbl>     <dbl>     <dbl>   <dbl>
+    ## 1 (Intercept)              -68.3     39632.  -0.00172   0.999
+    ## 2 mortality$`Grp 1 Dead`     3.68     1957.   0.00188   0.998
+
+``` r
+dose.p(pred1log,p = 0.5)
+```
+
+    ##              Dose       SE
+    ## p = 0.5: 18.55107 2919.175
+
+``` r
+data.frame(Concentration = mortality$`Log Concentration (micromolar)`, Mortality = mortality$`Grp 1 Dead`, Fitted = fitted(fit1log), Predicted = predict(pred1log, type = "response"))
+```
+
+    ##    Concentration Mortality     Fitted    Predicted
+    ## 1        0.00000        24 -1.3144841 1.000000e+00
+    ## 2       -3.00000        13 -1.3634981 1.339598e-09
+    ## 3       -2.00000        27 -1.3011166 1.000000e+00
+    ## 4       -1.30103       179 -0.6238326 1.000000e+00
+    ## 5       -1.00000       295 -0.1069579 1.000000e+00
+    ## 6       -0.60206       259 -0.2673673 1.000000e+00
+    ## 7       -0.30103       195 -0.5525395 1.000000e+00
+    ## 8        0.00000       294 -0.1114137 1.000000e+00
+    ## 9        0.39794       144 -0.7797861 1.000000e+00
+    ## 10       0.69897       165 -0.6862140 1.000000e+00
 
 ``` r
 ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relationship between predictor and response variables")
@@ -246,7 +250,7 @@ ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relat
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-2.png)
 
 ``` r
-ggplot(data = mortality, aes(fit1$residuals)) + 
+ggplot(data = mortality, aes(fit1log$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
         axis.line.x = element_line(),
@@ -257,7 +261,7 @@ ggplot(data = mortality, aes(fit1$residuals)) +
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-3.png)
 
 ``` r
-ggplot(data = mortality, aes(x = `Concentration (micromolar)`, y = `Grp 1 Mortality Rate`)) + geom_point()  +
+ggplot(data = mortality, aes(x = `Log Concentration (micromolar)`, y = `Grp 1 Dead`)) + geom_point()  +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
         axis.line.x = element_line(),
