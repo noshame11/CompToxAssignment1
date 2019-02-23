@@ -5,11 +5,11 @@ February 12, 2019
 
 ``` r
 ## non-linear regression, use dead data instead of mortality rate
-## x-axis in log value
+## Libraries, Set Up Graphics Parameters, Upload Data Set
 library(tidyverse)
 ```
 
-    ## -- Attaching packages ---------------------------------------- tidyverse 1.2.1 --
+    ## -- Attaching packages --- tidyverse 1.2.1 --
 
     ## v ggplot2 3.1.0       v purrr   0.3.0  
     ## v tibble  2.0.1       v dplyr   0.8.0.1
@@ -32,16 +32,30 @@ library(tidyverse)
 
     ## Warning: package 'forcats' was built under R version 3.5.2
 
-    ## -- Conflicts ------------------------------------------- tidyverse_conflicts() --
+    ## -- Conflicts ------ tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
 ``` r
+library(dplyr)
 library(janitor)
 library(broom)
 ```
 
     ## Warning: package 'broom' was built under R version 3.5.2
+
+``` r
+library(modelr)
+```
+
+    ## Warning: package 'modelr' was built under R version 3.5.2
+
+    ## 
+    ## Attaching package: 'modelr'
+
+    ## The following object is masked from 'package:broom':
+    ## 
+    ##     bootstrap
 
 ``` r
 library(httk)
@@ -109,10 +123,12 @@ mortality = read_csv("./RotenoneMortalityRateLogged.csv")
 
 ``` r
 ## Replication 1 - Logged Concentration Test Code
+## Normal Plot - Concentration vs Dead
+Norm_Conc_Dead1 = ggplot(mortality, aes(`Concentration (micromolar)`, `Grp 1 Dead`)) + geom_point(size = 2) + geom_smooth(span = 0.5)
+
 ## Local Regression - 50% smoothing span of Log Concentration with Dead
-normplot = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)) +
-    geom_point(size = 2) + geom_smooth(span = 0.5)
-  normplot + scale_x_log10() + xlim(-10, 10) + labs(title = "Replication 1, Rotenone   Dose-Response Curve")
+Regress_LogConc_Dead1 = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)) + geom_point(size = 2) + geom_smooth(span = 0.5)
+Regress_LogConc_Dead1 + scale_x_log10() + xlim(-10, 10) + labs(title = "Replication 1, Rotenone   Dose-Response Curve")
 ```
 
     ## Scale for 'x' is already present. Adding another scale for 'x', which
@@ -123,6 +139,7 @@ normplot = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
 ``` r
+## Fitted Values - Log Concentration vs Grp 1 Dead
 fit1log = lm(mortality$`Log Concentration (micromolar)` ~ mortality$`Grp 1 Dead`) 
 summary(fit1log)
 ```
@@ -167,6 +184,7 @@ fit1log %>%
     ## 2 mortality$`Grp 1 Dead`  0.00446   0.00338      1.32  0.224
 
 ``` r
+## Predicted Values - Log Concentration vs Grp 1 Dead
 pred1log = glm(factor(mortality$`Log Concentration (micromolar)`) ~ mortality$`Grp 1 Dead`, family = binomial(link = "logit"))
 ```
 
@@ -221,6 +239,7 @@ pred1log %>%
     ## 2 mortality$`Grp 1 Dead`     3.68     1957.   0.00188   0.998
 
 ``` r
+## LD50 based on Predicted Value
 dose.p(pred1log,p = 0.5)
 ```
 
@@ -228,6 +247,7 @@ dose.p(pred1log,p = 0.5)
     ## p = 0.5: 18.55107 2919.175
 
 ``` r
+## Concentration, Mortality, Fitted, Predicted Chart
 data.frame(Concentration = mortality$`Log Concentration (micromolar)`, Mortality = mortality$`Grp 1 Dead`, Fitted = fitted(fit1log), Predicted = predict(pred1log, type = "response"))
 ```
 
@@ -244,12 +264,14 @@ data.frame(Concentration = mortality$`Log Concentration (micromolar)`, Mortality
     ## 10       0.69897       165 -0.6862140 1.000000e+00
 
 ``` r
+## Relationships Between Group 1 Variables
 ggpairs(data = mortality, columns = 1:5, title = "Group 1 Mortality Data - relationship between predictor and response variables")
 ```
 
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-2.png)
 
 ``` r
+## Fitted Model Residuals - Histogram Log Concentration vs Grp 1 Dead
 ggplot(data = mortality, aes(fit1log$residuals)) + 
   geom_histogram(binwidth = 0.25, color = "black", fill = "purple4") +
   theme(panel.background = element_rect(fill = "white"),
@@ -261,7 +283,8 @@ ggplot(data = mortality, aes(fit1log$residuals)) +
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-3.png)
 
 ``` r
-ggplot(data = mortality, aes(x = `Log Concentration (micromolar)`, y = `Grp 1 Dead`)) + geom_point()  +
+## Linear Fitted Model - Log Concentration vs Grp 1 Dead
+ggplot(data = mortality, aes(x = `Log Concentration (micromolar)`, y = `Grp 1 Dead`)) + geom_point() +
   stat_smooth(method = "lm", col = "dodgerblue3") +
   theme(panel.background = element_rect(fill = "white"),
         axis.line.x = element_line(),
