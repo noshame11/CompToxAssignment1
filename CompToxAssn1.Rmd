@@ -2,10 +2,10 @@
 title: "Rotenone Mortality"
 author: "Vincent Tam"
 date: "February 12, 2019"
-output: github_document
+output: html_document
 ---
 
-```{r echo = FALSE, warning = FALSE}
+```{r echo = FALSE, warning = FALSE, message = FALSE}
 ## non-linear regression, use dead data instead of mortality rate
 ## Libraries, Set Up Graphics Parameters, Upload Data Set
 library(tidyverse)
@@ -18,19 +18,24 @@ library(drc)
 library(ggplot2)
 library(GGally)
 library(MASS)
+library(plotly)
+library(knitr)
 par(mar = c(1,1,1,1))
 mortality = read_csv("./RotenoneMortalityRateLogged.csv")
 
 ## Replication 1 - Logged Concentration Test Code
 ## Normal Plot - Concentration vs Dead
 Norm_Conc_Dead1 = ggplot(mortality, aes(`Concentration (micromolar)`, `Grp 1 Dead`)) + geom_point(size = 2) + geom_smooth(span = 0.5)
+ggplotly(Norm_Conc_Dead1)
 
 ## Local Regression - 50% smoothing span of Log Concentration with Dead
 Regress_LogConc_Dead1 = ggplot(mortality, aes(`Log Concentration (micromolar)`, `Grp 1 Dead`)) + geom_point(size = 2) + geom_smooth(span = 0.5)
 Regress_LogConc_Dead1 + scale_x_log10() + xlim(-10, 10) + labs(title = "Replication 1, Rotenone   Dose-Response Curve")
+ggplotly(Regress_LogConc_Dead1)
 
 ## Fitted Values - Log Concentration vs Grp 1 Dead
 fit1log = lm(mortality$`Log Concentration (micromolar)` ~ mortality$`Grp 1 Dead`) 
+kable(summary(fit1log), format = "markdown", align = "c", row.names = TRUE)
 summary(fit1log)
 fitted(fit1log)
 fit1log %>% 

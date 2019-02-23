@@ -3,66 +3,6 @@ Rotenone Mortality
 Vincent Tam
 February 12, 2019
 
-    ## -- Attaching packages ------------------------------------------------------- tidyverse 1.2.1 --
-
-    ## v ggplot2 3.1.0       v purrr   0.3.0  
-    ## v tibble  2.0.1       v dplyr   0.8.0.1
-    ## v tidyr   0.8.2       v stringr 1.4.0  
-    ## v readr   1.3.1       v forcats 0.4.0
-
-    ## -- Conflicts ---------------------------------------------------------- tidyverse_conflicts() --
-    ## x dplyr::filter() masks stats::filter()
-    ## x dplyr::lag()    masks stats::lag()
-
-    ## 
-    ## Attaching package: 'modelr'
-
-    ## The following object is masked from 'package:broom':
-    ## 
-    ##     bootstrap
-
-    ## Loading required package: MASS
-
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
-    ## 
-    ## 'drc' has been loaded.
-
-    ## Please cite R and 'drc' if used for a publication,
-
-    ## for references type 'citation()' and 'citation('drc')'.
-
-    ## 
-    ## Attaching package: 'drc'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     gaussian, getInitial
-
-    ## 
-    ## Attaching package: 'GGally'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     nasa
-
-    ## Parsed with column specification:
-    ## cols(
-    ##   .default = col_double()
-    ## )
-
-    ## See spec(...) for full column specifications.
-
-    ## Scale for 'x' is already present. Adding another scale for 'x', which
-    ## will replace the existing scale.
-
-    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-
 ![](CompToxAssn1_files/figure-markdown_github/unnamed-chunk-1-1.png)
 
     ## 
