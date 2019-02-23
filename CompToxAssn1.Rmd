@@ -5,7 +5,7 @@ date: "February 12, 2019"
 output: github_document
 ---
 
-```{r}
+```{r echo = FALSE, warning = FALSE}
 ## non-linear regression, use dead data instead of mortality rate
 ## Libraries, Set Up Graphics Parameters, Upload Data Set
 library(tidyverse)
