@@ -51,12 +51,12 @@ predict(pred1log, type = "response")
 pred1log %>%
   broom::tidy()
 ## LD50 based on Predicted Value
-dose.p(pred1log,p = 0.5)
+exp(dose.p(pred1log,p = 0.5))
 ## Concentration, Mortality, Fitted, Predicted Chart
 data.frame(Concentration = mortality$`Log Concentration (micromolar)`, Mortality = mortality$`Grp 1 Dead`, Fitted = fitted(fit1log), Predicted = predict(pred1log, type = "response"))
 ## ggpairs Relationships Between Group 1 Variables
 d1 <- highlight_key(iris)
-p1 <- ggpairs(data = mortality, columns = 1:5, title = "Group 1 - Relationship between predictor and response variables")
+p1 <- ggpairs(data = mortality, columns = 1:5, title = "Group 1 - Relationship between predictor and response variables", upper = list(continuous = wrap("cor", size = 3)))
 ggplotly(p1) %>% 
 highlight("plotly_selected")
 ## Fitted Model Residuals - Histogram Log Concentration vs Grp 1 Dead
